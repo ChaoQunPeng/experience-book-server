@@ -7,7 +7,4 @@
  * @Description: 
 -->
 启动
-
 DEBUG=experience-bood-server:* npm start
-
-mysql -u root -p
