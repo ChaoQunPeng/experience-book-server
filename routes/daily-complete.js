@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2023-12-29 13:16:22
+ * @LastEditTime: 2023-12-29 18:07:34
  * @FilePath: /experience-bood-server/routes/daily-complete.js
  * @Description: 打卡路由
  */
@@ -26,6 +26,7 @@ router.get('/', async (req, res, next) => {
     rawData.forEach(item => {
       if (map.has(item.id)) {
         const existingData = map.get(item.id);
+
         const punch = {
           id: item.punch_id,
           create_time: dayjs(item.punch_create_time).format('YYYY-MM-DD')
@@ -40,13 +41,21 @@ router.get('/', async (req, res, next) => {
           create_time: item.create_time,
           punch_list: []
         };
+
         const punch = {
           id: item.punch_id,
           create_time: dayjs(item.punch_create_time).format('YYYY-MM-DD')
         };
+
         if (punch.id !== null) {
           newData.punch_list.push(punch);
         }
+
+        newData.today_punch_status =
+          rawData.findIndex(
+            e => dayjs(e.punch_create_time).format('YYYY-MM-DD') == dayjs().format('YYYY-MM-DD') && e.id == newData.id
+          ) > -1;
+
         map.set(item.id, newData);
       }
     });
