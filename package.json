@@ -1,0 +1,31 @@
+{
+  "name": "experience-bood-server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "dayjs": "^1.11.10",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.0.3",
+    "morgan": "~1.9.1",
+    "mysql2": "^3.6.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "package.json",
+      "package-lock.json",
+      "mysql/*",
+      "docs/*"
+    ]
+  }
+}
