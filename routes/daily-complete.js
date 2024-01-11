@@ -2,15 +2,13 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2023-12-29 18:07:34
+ * @LastEditTime: 2024-01-02 13:03:27
  * @FilePath: /experience-bood-server/routes/daily-complete.js
  * @Description: 打卡路由
  */
 
 var express = require('express');
 var router = express.Router();
-const mongoose = require('mongoose');
-const { DailyCompleteModel, DailyCompletePunchModel, DailyCompleteSchema } = require('../model/daily-complete');
 const { SuccessModel, ErrorModel } = require('../http/response-model');
 const { sqlExec } = require('../mysql/exec');
 const dayjs = require('dayjs');

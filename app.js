@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:15:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2023-12-29 13:28:56
+ * @LastEditTime: 2024-01-02 13:04:33
  * @FilePath: /experience-bood-server/app.js
  * @Description:
  */
@@ -15,8 +15,8 @@ var logger = require('morgan');
 // import { connect } from './mongodb/db';
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var skillRouter = require('./routes/skill');
+// var usersRouter = require('./routes/users');
+// var skillRouter = require('./routes/skill');
 var dailyCompleteRouter = require('./routes/daily-complete');
 
 var app = express();
@@ -55,8 +55,8 @@ app.use(function (req, res, next) {
 });
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/skill', skillRouter);
+// app.use('/users', usersRouter);
+// app.use('/skill', skillRouter);
 app.use('/daily-complete', dailyCompleteRouter);
 
 // catch 404 and forward to error handler
