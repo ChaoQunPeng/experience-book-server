@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-01-02 13:03:27
+ * @LastEditTime: 2024-01-13 13:26:17
  * @FilePath: /experience-bood-server/routes/daily-complete.js
  * @Description: 打卡路由
  */
@@ -77,7 +77,9 @@ LEFT JOIN
 	  experience_book.daily_complete_punch dcp on dc.id = dcp.daily_complete_id
 WHERE
     dc.is_valid = 1
-  `);
+  `).catch(err => {
+    res.json(new ErrorModel({ msg: '应用程序出错', data: err, writeInLog: true }));
+  });
 
   if (sqlQueryResult) {
     res.json(new SuccessModel({ data: resolveData(sqlQueryResult) }));

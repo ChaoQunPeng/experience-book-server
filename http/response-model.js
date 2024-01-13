@@ -2,8 +2,8 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-25 12:54:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2023-12-25 13:05:14
- * @FilePath: /experience-bood-server/http/model.js
+ * @LastEditTime: 2024-01-13 13:26:25
+ * @FilePath: /experience-bood-server/http/response-model.js
  * @Description:
  */
 class SuccessModel {
@@ -19,6 +19,7 @@ class ErrorModel {
     this.code = options.code ?? 0;
     this.msg = options.msg ?? '';
     this.data = options.data ?? {};
+    this.writeInLog = options.writeInLog ?? false;
   }
 }
 
