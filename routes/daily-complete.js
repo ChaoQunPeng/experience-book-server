@@ -3,7 +3,7 @@
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
  * @LastEditTime: 2024-01-13 13:26:17
- * @FilePath: /experience-bood-server/routes/daily-complete.js
+ * @FilePath: /experience-book-server/routes/daily-complete.js
  * @Description: 打卡路由
  */
 

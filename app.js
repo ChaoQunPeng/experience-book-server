@@ -2,8 +2,8 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:15:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-01-02 13:04:33
- * @FilePath: /experience-bood-server/app.js
+ * @LastEditTime: 2024-02-03 19:12:57
+ * @FilePath: /experience-book-server/app.js
  * @Description:
  */
 var createError = require('http-errors');
@@ -16,7 +16,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
-// var skillRouter = require('./routes/skill');
+var skillRouter = require('./routes/skill');
+var noteRouter = require('./routes/note');
 var dailyCompleteRouter = require('./routes/daily-complete');
 
 var app = express();
@@ -56,7 +57,8 @@ app.use(function (req, res, next) {
 
 app.use('/', indexRouter);
 // app.use('/users', usersRouter);
-// app.use('/skill', skillRouter);
+app.use('/skill', skillRouter);
+app.use('/note', noteRouter);
 app.use('/daily-complete', dailyCompleteRouter);
 
 // catch 404 and forward to error handler

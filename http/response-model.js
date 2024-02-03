@@ -2,8 +2,8 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-25 12:54:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-01-13 13:26:25
- * @FilePath: /experience-bood-server/http/response-model.js
+ * @LastEditTime: 2024-02-03 18:17:11
+ * @FilePath: /experience-book-server/http/response-model.js
  * @Description:
  */
 class SuccessModel {

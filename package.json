@@ -1,5 +1,5 @@
 {
-  "name": "experience-bood-server",
+  "name": "experience-book-server",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -23,7 +23,6 @@
     "ignore": [
       "package.json",
       "package-lock.json",
-      "mysql/*",
       "docs/*"
     ]
   }
