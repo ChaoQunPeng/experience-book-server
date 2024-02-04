@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-03 20:19:27
+ * @LastEditTime: 2024-02-04 17:32:10
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -91,28 +91,25 @@ router.get('/list', async (req, res, next) => {
   let result = {};
 
   if (sqlResult) {
-    result = sqlResult
-      .map(e => {
-        const newData = {};
-        // newData.total_exp = e.total_exp == null ? 0 : parseInt(e.total_exp);
+    result = sqlResult.map(e => {
+      const newData = {};
 
-        const parseData = getPhaseInfo(parseInt(e.total_exp));
+      const parseData = getPhaseInfo(parseInt(e.total_exp ?? 0));
 
-        if (!parseData) {
-          return;
-        }
+      if (!parseData) {
+        return;
+      }
 
-        newData.id = e.id;
-        newData.name = parseData.skill_name;
-        newData.level = parseData.level;
-        newData.levelName = parseData.name;
-        newData.currentLevelExp = parseData.currentExp;
-        newData.color = parseData.color;
-        newData.range = parseData.range;
+      newData.id = e.id;
+      newData.name = e.skill_name;
+      newData.level = parseData.level;
+      newData.levelName = parseData.name;
+      newData.currentLevelExp = parseData.currentExp;
+      newData.color = parseData.color;
+      newData.range = parseData.range;
 
-        return newData;
-      })
-      .filter(e => e);
+      return newData;
+    });
   }
 
   if (sqlResult) {
@@ -123,7 +120,7 @@ router.get('/list', async (req, res, next) => {
 });
 
 /**
- * 获取技能选项列表
+ * 获取技能下拉选项
  */
 router.get('/options', async (req, res, next) => {
   const sqlResult = await sqlExec(`SELECT id, name FROM experience_book.skill;`).catch(err => {
@@ -132,6 +129,22 @@ router.get('/options', async (req, res, next) => {
 
   if (sqlResult) {
     res.send(new SuccessModel({ data: sqlResult }));
+  } else {
+    res.send(new ErrorModel());
+  }
+});
+
+/**
+ * 获取技能列表
+ */
+router.get('/:id', async (req, res, next) => {
+  const sqlResult = await sqlExec(`SELECT * FROM skill s WHERE id=${req.params.id}`).catch(err => {
+    res.send(new ErrorModel({ msg: '获取技能详情失败' }));
+  });
+
+
+  if (sqlResult && sqlResult.length > 0) {
+    res.send(new SuccessModel({ data: sqlResult[0] }));
   } else {
     res.send(new ErrorModel());
   }

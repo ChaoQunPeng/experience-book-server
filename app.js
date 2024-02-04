@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:15:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-03 19:12:57
+ * @LastEditTime: 2024-02-04 15:31:43
  * @FilePath: /experience-book-server/app.js
  * @Description:
  */
@@ -37,7 +37,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function (req, res, next) {
-  console.log(req.headers['res-code-styleguide']);
+  // console.log(req.headers['res-code-styleguide']);
 
   // 保存原始的send方法
   var originalSend = res.send;

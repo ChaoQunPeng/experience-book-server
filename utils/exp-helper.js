@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-01 16:40:17
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-03 20:17:38
+ * @LastEditTime: 2024-02-04 17:49:50
  * @FilePath: /experience-book-server/utils/exp-helper.js
  * @Description:
  */
@@ -67,7 +67,7 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
   };
 
   const colorMaps = {
-    1: 'green',
+    1: 'black-85',
     2: 'blue',
     3: 'red',
     4: 'purple',
