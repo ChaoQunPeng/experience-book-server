@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-04 17:32:10
+ * @LastEditTime: 2024-02-05 19:46:49
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -137,11 +137,57 @@ router.get('/options', async (req, res, next) => {
 /**
  * 获取技能列表
  */
+router.get('/note-list/:id', async (req, res, next) => {
+  const sqlResult = await sqlExec(`
+  SELECT s.id,s.name,n.id as note_id, n.title , n.content ,n.exp  ,n.create_time as note_create_time
+  FROM skill s left join note n 
+  on s.id = n.skill_id 
+  WHERE n.skill_id =${req.params.id}
+  `).catch(err => {
+    console.log(`接口查询错误：${req.originalUrl}----`, JSON.stringify(err));
+  });
+
+  const processData = (dataList, skillId) => {
+    const data = {};
+
+    const skillList = dataList.filter(e => e.id == skillId);
+
+    skillList.forEach(e => {
+      data.id = e.id;
+      data.name = e.name;
+
+      data.expTotal = skillList.reduce((acc, cur) => {
+        return (acc += cur.exp);
+      }, 0);
+
+      data.noteList = skillList.map(e => {
+        return {
+          id: e.note_id,
+          title: e.title,
+          exp: e.exp,
+          summary: e.content.slice(0, 100),
+          createDateTime: e.note_create_time
+        };
+      });
+    });
+
+    return data;
+  };
+
+  if (sqlResult && sqlResult.length > 0) {
+    res.send(new SuccessModel({ data: processData(sqlResult, req.params.id) }));
+  } else {
+    res.send(new ErrorModel({ msg: '获取笔记列表失败' }));
+  }
+});
+
+/**
+ * 获取技能列表
+ */
 router.get('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(`SELECT * FROM skill s WHERE id=${req.params.id}`).catch(err => {
     res.send(new ErrorModel({ msg: '获取技能详情失败' }));
   });
-
 
   if (sqlResult && sqlResult.length > 0) {
     res.send(new SuccessModel({ data: sqlResult[0] }));
