@@ -2,8 +2,8 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-03 18:26:45
- * @FilePath: /experience-book-server/routes/skill.js
+ * @LastEditTime: 2024-02-05 20:31:42
+ * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
 
@@ -46,7 +46,7 @@ router.post('/', async (req, res, next) => {
  */
 router.delete('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `DELETE FROM experience_book.skill WHERE id=${req.params.id}`
+    `DELETE FROM experience_book.note WHERE id=${req.params.id}`
   ).catch(err => {
     res.send(new ErrorModel({ msg: '删除技能失败' }));
   });
