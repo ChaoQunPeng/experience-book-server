@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-05 19:46:49
+ * @LastEditTime: 2024-02-06 12:37:32
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -143,6 +143,7 @@ router.get('/note-list/:id', async (req, res, next) => {
   FROM skill s left join note n 
   on s.id = n.skill_id 
   WHERE n.skill_id =${req.params.id}
+  ORDER BY n.create_time DESC
   `).catch(err => {
     console.log(`接口查询错误：${req.originalUrl}----`, JSON.stringify(err));
   });
