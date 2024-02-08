@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-08 12:18:20
+ * @LastEditTime: 2024-02-08 19:03:59
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -37,16 +37,26 @@ router.post('/', async (req, res, next) => {
  * 删除技能
  */
 router.delete('/:id', async (req, res, next) => {
-  const sqlResult = await sqlExec(
-    `DELETE FROM experience_book.skill WHERE id=${req.params.id}`
-  ).catch(err => {
+  const hasNote = await sqlExec(`
+    SELECT * FROM experience_book.note WHERE skill_id=${req.params.id}
+    `).catch(err => {
     console.log(err);
   });
 
-  if (sqlResult.affectedRows > 0) {
-    res.send(new SuccessModel({ data: null }));
+  if (hasNote && hasNote.length > 0) {
+    res.send(new ErrorModel({ msg: `技能下面有笔记，不能删除哦！` }));
   } else {
-    res.send(new ErrorModel({ msg: '删除技能失败' }));
+    const sqlResult = await sqlExec(
+      `DELETE FROM experience_book.skill WHERE id=${req.params.id}`
+    ).catch(err => {
+      console.log(err);
+    });
+
+    if (sqlResult && sqlResult.affectedRows > 0) {
+      res.send(new SuccessModel({ data: null }));
+    } else {
+      res.send(new ErrorModel({ msg: '删除技能失败' }));
+    }
   }
 });
 
@@ -168,7 +178,7 @@ router.get('/note-list/:id', async (req, res, next) => {
           title: e.title,
           exp: e.exp,
           summary: e.content.slice(0, 100),
-          createDateTime: e.note_create_time
+          createDateTime: dayjs(e.note_create_time).format('YYYYMM/DD HH:mm')
         };
       });
     });
