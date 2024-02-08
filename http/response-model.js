@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-25 12:54:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-03 18:17:11
+ * @LastEditTime: 2024-02-07 22:29:58
  * @FilePath: /experience-book-server/http/response-model.js
  * @Description:
  */
@@ -19,7 +19,7 @@ class ErrorModel {
     this.code = options.code ?? 0;
     this.msg = options.msg ?? '';
     this.data = options.data ?? {};
-    this.writeInLog = options.writeInLog ?? false;
+    // this.writeInLog = options.writeInLog ?? false;
   }
 }
 

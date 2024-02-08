@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-06 16:27:04
+ * @LastEditTime: 2024-02-08 12:16:54
  * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
@@ -24,8 +24,7 @@ router.post('/', async (req, res, next) => {
     req.body.skillId
   },1);
   `).catch(err => {
-    // err [ 'code', 'errno', 'sqlState', 'sqlMessage', 'sql' ]
-    // res.send(new ErrorModel({ msg: '新增笔记失败' }));
+    console.log(err);
   });
 
   if (sqlResult && sqlResult.affectedRows) {
@@ -42,13 +41,13 @@ router.delete('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(
     `DELETE FROM experience_book.note WHERE id=${req.params.id}`
   ).catch(err => {
-    res.send(new ErrorModel({ msg: '删除笔记失败' }));
+    console.log(err);
   });
 
   if (sqlResult.affectedRows > 0) {
     res.send(new SuccessModel({ data: null }));
   } else {
-    res.send(new ErrorModel());
+    res.send(new ErrorModel({ msg: '删除笔记失败' }));
   }
 });
 
@@ -61,29 +60,13 @@ router.put('/:id', async (req, res, next) => {
   const updateInfoSql = `title='${title}', content='${content}', remark='${remark}', skill_id=${skillId}`;
   const updateExpSql = `exp=${exp}`;
 
-  console.log(Object.keys(req.body));
-
-  console.log(`UPDATE experience_book.note
-  SET ${Object.keys(req.body).findIndex(e=>e=='exp') > -1 ? updateExpSql : updateInfoSql}
-  WHERE id=${req.params.id};`);
-
   const sqlResult = await sqlExec(
     `UPDATE experience_book.note
-  SET ${Object.keys(req.body).findIndex(e=>e=='exp') > -1 ? updateExpSql : updateInfoSql}
+  SET ${Object.keys(req.body).findIndex(e => e == 'exp') > -1 ? updateExpSql : updateInfoSql}
   WHERE id=${req.params.id};`
   ).catch(err => {
     console.log(err);
   });
-
-  // const sqlResult = await sqlExec(
-  //   `UPDATE experience_book.note
-  // SET title='${title}', content='${content}', remark='${remark}', skill_id=${skillId}
-  // WHERE id=${req.params.id};`
-  // ).catch(err => {
-  //   console.log(err);
-  // });
-
-  console.log(`sqlResult`, sqlResult);
 
   if (sqlResult && sqlResult.affectedRows > 0) {
     res.send(new SuccessModel());
@@ -99,13 +82,13 @@ router.get('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(
     `SELECT *,skill_id as skillId FROM experience_book.note WHERE id = ${req.params.id}`
   ).catch(err => {
-    res.send(new ErrorModel({ msg: '查询技能列表失败' }));
+    console.log(err);
   });
 
   if (sqlResult && sqlResult.length > 0) {
     res.send(new SuccessModel({ data: sqlResult[0] }));
   } else {
-    res.send(new ErrorModel());
+    res.send(new ErrorModel({ msg: '获取笔记详情失败' }));
   }
 });
 

@@ -2,12 +2,13 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:15:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-04 15:31:43
+ * @LastEditTime: 2024-02-08 12:00:35
  * @FilePath: /experience-book-server/app.js
  * @Description:
  */
 var createError = require('http-errors');
 var express = require('express');
+require('express-async-errors');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -37,6 +38,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function (req, res, next) {
+  console.log(1);
   // console.log(req.headers['res-code-styleguide']);
 
   // 保存原始的send方法
@@ -63,11 +65,15 @@ app.use('/daily-complete', dailyCompleteRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
+  console.log(2);
   next(createError(404));
 });
 
 // error handler
 app.use(function (err, req, res, next) {
+  // console.log(JSON.stringify(err), JSON.stringify(req), JSON.stringify(res));
+  console.log(`错误：`,JSON.stringify(err));
+
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

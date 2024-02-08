@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-01-13 13:26:17
+ * @LastEditTime: 2024-02-07 22:21:06
  * @FilePath: /experience-book-server/routes/daily-complete.js
  * @Description: 打卡路由
  */
@@ -78,7 +78,7 @@ LEFT JOIN
 WHERE
     dc.is_valid = 1
   `).catch(err => {
-    res.json(new ErrorModel({ msg: '应用程序出错', data: err, writeInLog: true }));
+    // res.json(new ErrorModel({ msg: '应用程序出错', data: err, writeInLog: true }));
   });
 
   if (sqlQueryResult) {
