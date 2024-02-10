@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-01 16:40:17
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-04 17:49:50
+ * @LastEditTime: 2024-02-10 22:21:19
  * @FilePath: /experience-book-server/utils/exp-helper.js
  * @Description:
  */
@@ -24,7 +24,7 @@ function getPhaseInfo(totalExp) {
       [2200, 2599],
       [2600, 2999]
     ];
-    return getLevelInfo(totalExp, expRange, '高级新手', 399);
+    return getLevelInfo(totalExp, expRange, '熟练者', 399);
   } else if (totalExp >= 3000 && totalExp < 6000) {
     const expRange = [
       [3000, 3599],
@@ -59,7 +59,7 @@ function getPhaseInfo(totalExp) {
 function getLevelInfo(totalExp, expRange, levelName, levelExp) {
   const data = {
     name: levelName,
-    level: 0,
+    level: 0, // 当前阶段的等级
     romanNum: 0,
     levelBaseExp: levelExp,
     range: [],
@@ -67,11 +67,11 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
   };
 
   const colorMaps = {
-    1: 'black-85',
-    2: 'blue',
-    3: 'red',
-    4: 'purple',
-    5: 'black'
+    新手: 'black-85',
+    熟练者: 'blue',
+    胜任者: 'red',
+    精通者: 'purple',
+    专家: 'black'
   };
 
   for (let i = 0; i < expRange.length; i++) {
@@ -97,8 +97,7 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
       data.level = i + 1;
       data.currentExp = totalExp - expRange[i][0];
       data.range = expRange[i];
-      // data.width = getProgressLength(totalExp, data);
-      data.color = colorMaps[data.level];
+      data.color = colorMaps[levelName];
     }
   }
 
