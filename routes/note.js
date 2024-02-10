@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-08 12:16:54
+ * @LastEditTime: 2024-02-10 20:59:11
  * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
@@ -52,7 +52,7 @@ router.delete('/:id', async (req, res, next) => {
 });
 
 /**
- * 编辑笔记
+ * 编辑笔记或经验
  */
 router.put('/:id', async (req, res, next) => {
   const { title, content, exp, remark, skillId } = req.body;
