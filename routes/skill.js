@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-08 19:03:59
+ * @LastEditTime: 2024-02-12 17:24:13
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -84,7 +84,17 @@ router.put('/:id', async (req, res, next) => {
  */
 router.get('/list', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `SELECT s.id,s.name as skill_name ,SUM(n.exp) as total_exp  FROM skill s left join note n on s.id =n.skill_id GROUP BY s.id`
+    `
+    SELECT 
+    s.id,s.name as skill_name ,SUM(n.exp) as exp_total ,
+    (SELECT COUNT(*) FROM note n2 WHERE skill_id=s.id) as note_total
+  FROM 
+    skill s 
+  left join 
+    note n on s.id =n.skill_id 
+  GROUP BY 
+    s.id
+    `
   ).catch(err => {
     console.log(err);
   });
@@ -110,6 +120,8 @@ router.get('/list', async (req, res, next) => {
     newData.levelName = parseData.name;
     newData.currentLevelExp = parseData.currentExp;
     newData.color = parseData.color;
+    newData.noteTotal = e.note_total;
+    newData.expTotal = e.exp_total;
     newData.range = parseData.range;
 
     return newData;
@@ -138,7 +150,7 @@ router.get('/options', async (req, res, next) => {
 });
 
 /**
- * 获取技能列表
+ * 获取技能笔记列表
  */
 router.get('/note-list/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(`
