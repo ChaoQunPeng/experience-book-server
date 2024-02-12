@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-12 17:24:13
+ * @LastEditTime: 2024-02-12 18:32:58
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -108,7 +108,7 @@ router.get('/list', async (req, res, next) => {
   result = sqlResult.map(e => {
     const newData = {};
 
-    const parseData = getPhaseInfo(parseInt(e.total_exp ?? 0));
+    const parseData = getPhaseInfo(parseInt(e.exp_total ?? 0));
 
     if (!parseData) {
       return;
