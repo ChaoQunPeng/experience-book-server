@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-12 18:32:58
+ * @LastEditTime: 2024-02-13 17:04:59
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -86,8 +86,9 @@ router.get('/list', async (req, res, next) => {
   const sqlResult = await sqlExec(
     `
     SELECT 
-    s.id,s.name as skill_name ,SUM(n.exp) as exp_total ,
-    (SELECT COUNT(*) FROM note n2 WHERE skill_id=s.id) as note_total
+    s.id,s.name as skill_name ,SUM(n.exp) as exp_total,
+    (SELECT COUNT(*) FROM note n2 WHERE skill_id=s.id) as note_total,
+    (SELECT COUNT(*) FROM note n3 WHERE skill_id=s.id AND n3.exp=0) as todo_note_total
   FROM 
     skill s 
   left join 
@@ -99,7 +100,8 @@ router.get('/list', async (req, res, next) => {
     console.log(err);
   });
 
-  if (sqlResult === undefined) {
+  if (sqlResult == undefined) {
+    res.send(new ErrorModel({ msg: '获取技能列表失败' }));
     return;
   }
 
@@ -116,12 +118,14 @@ router.get('/list', async (req, res, next) => {
 
     newData.id = e.id;
     newData.name = e.skill_name;
+    newData.noteTotal = e.note_total;
+    newData.expTotal = e.exp_total;
+    newData.todoNoteTotal = e.todo_note_total;
+
     newData.level = parseData.level;
     newData.levelName = parseData.name;
     newData.currentLevelExp = parseData.currentExp;
     newData.color = parseData.color;
-    newData.noteTotal = e.note_total;
-    newData.expTotal = e.exp_total;
     newData.range = parseData.range;
 
     return newData;
@@ -190,7 +194,7 @@ router.get('/note-list/:id', async (req, res, next) => {
           title: e.title,
           exp: e.exp,
           summary: e.content.slice(0, 100),
-          createDateTime: dayjs(e.note_create_time).format('YYYYMM/DD HH:mm')
+          createDateTime: dayjs(e.note_create_time).format('YYYY/MM/DD HH:mm')
         };
       });
     });
