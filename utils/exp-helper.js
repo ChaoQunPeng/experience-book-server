@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-01 16:40:17
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-10 22:21:19
+ * @LastEditTime: 2024-02-14 09:43:46
  * @FilePath: /experience-book-server/utils/exp-helper.js
  * @Description:
  */
@@ -62,6 +62,7 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
     level: 0, // 当前阶段的等级
     romanNum: 0,
     levelBaseExp: levelExp,
+    currentExp: 0, // 当前等级的经验。 例如：总经验200，当前等级经验就是新手2星 1exp/199exp
     range: [],
     width: {} // 赋值给:style
   };
@@ -95,23 +96,19 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
       }
 
       data.level = i + 1;
-      data.currentExp = totalExp - expRange[i][0];
+
+      if (i == 0) {
+        data.currentExp = totalExp - expRange[i][0];
+      } else {
+        data.currentExp = totalExp - (expRange[i][0] - 1);
+      }
+
       data.range = expRange[i];
       data.color = colorMaps[levelName];
     }
   }
 
   return data;
-}
-
-function getProgressLength(totalExp, levelData) {
-  // totalExp 可能为null,即0
-  // [0,199]  (2-0) / 199
-  // [6000, 6799] (6500-6000) / 799
-  // let width = Number(totalExp) / Number(levelData.range[1]); // 这是总的经验条
-  let width = (totalExp - levelData.range[0]) / levelData.levelBaseExp; // 这是每个等级的基础经验条
-  return { width: width * 100 + '%' };
-  // return width * 100 + "%";
 }
 
 module.exports = {
