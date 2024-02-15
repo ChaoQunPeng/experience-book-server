@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-13 17:04:59
+ * @LastEditTime: 2024-02-15 18:51:55
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -221,6 +221,191 @@ router.get('/:id', async (req, res, next) => {
     res.send(new SuccessModel({ data: sqlResult[0] }));
   } else {
     res.send(new ErrorModel({ msg: '获取技能详情失败' }));
+  }
+});
+
+/**
+ * 获取技能经验统计
+ */
+router.get('/exp/statistics', async (req, res, next) => {
+  const sqlResult = await sqlExec(
+    `SELECT s.name ,  SUM(n.exp) as total_exp  FROM skill s  left join note n on s.id = n.skill_id  GROUP BY s.id`
+  ).catch(err => {
+    console.log(err);
+  });
+
+  if (sqlResult) {
+    const data = sqlResult.map(e => {
+      return {
+        name: e.name,
+        totalExp: parseInt(e.total_exp)
+      };
+    });
+
+    res.send(new SuccessModel({ data: data }));
+  } else {
+    res.send(new ErrorModel({ msg: '获取技能经验统计失败' }));
+  }
+});
+
+/**
+ * 获取技能学习趋势
+ */
+router.get('/exp/trend', async (req, res, next) => {
+  const sqlResult = await sqlExec(
+    `SELECT s.name as skill ,n.get_exp_datetime, n.exp  FROM skill s LEFT JOIN note n on s.id = n.skill_id`
+  ).catch(err => {
+    console.log(err);
+  });
+
+  if (!sqlResult) {
+    res.send(new ErrorModel({ msg: '获取技能学习趋势失败' }));
+    return;
+  }
+
+  sqlResult.forEach(e => {
+    e.get_exp_datetime = dayjs(e.get_exp_datetime).format('YYYY-MM-DD');
+  });
+
+  /**
+   * @description: 处理技能经验趋势的数据
+   * @param {*} data
+   * @return {*}
+   */
+  const parseSkillExpTrendData = data => {
+    // 使用 reduce() 方法处理数据
+    const result = data.reduce((accumulator, current) => {
+      const key = `${current.get_exp_datetime}-${current.skill}`;
+
+      if (accumulator[key]) {
+        accumulator[key].exp += current.exp;
+      } else {
+        accumulator[key] = { ...current };
+      }
+
+      return accumulator;
+    }, {});
+
+    // 补充缺失的日期和技能组合
+    const allDates = [...new Set(data.map(item => item.get_exp_datetime))];
+    const allSkills = [...new Set(data.map(item => item.skill))];
+
+    allDates.forEach(date => {
+      allSkills.forEach(skill => {
+        const key = `${date}-${skill}`;
+        if (!result[key]) {
+          result[key] = {
+            get_exp_datetime: date,
+            exp: 0,
+            skill: skill
+          };
+        }
+      });
+    });
+
+    return Object.values(result);
+  };
+
+  const parseSkillExpTrendData2 = data => {
+    // 构建日期范围
+    const sdate = dayjs().startOf('week').add(1, 'day').format('YYYY-MM-DD');
+    const edate = dayjs().startOf('week').add(7, 'day').format('YYYY-MM-DD');
+
+    const startDate = new Date(sdate); // 开始日期
+    const endDate = new Date(edate); // 结束日期
+
+    const dateRange = [];
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      dateRange.push(currentDate.toISOString().slice(0, 10)); // 添加当前日期到日期范围数组
+      currentDate.setDate(currentDate.getDate() + 1); // 增加一天
+    }
+
+    // 处理数据
+    const result = dateRange.flatMap(date => {
+      return [...new Set(data.map(item => item.skill))].map(skill => {
+        const filteredItems = data.filter(item => {
+          return dayjs(item.get_exp_datetime).format('YYYY-MM-DD') === date && item.skill === skill;
+        });
+
+        const totalExp = filteredItems.reduce((acc, curr) => acc + curr.exp, 0);
+
+        return {
+          get_exp_datetime: date,
+          exp: totalExp,
+          skill: skill
+        };
+      });
+    });
+
+    return result;
+  };
+
+  const mockData = [
+    {
+      get_exp_datetime: '2023-02-12',
+      exp: 1,
+      skill: '前端'
+    },
+    {
+      get_exp_datetime: '2023-02-12',
+      exp: 2,
+      skill: '前端'
+    },
+    {
+      get_exp_datetime: '2023-02-12',
+      exp: 3,
+      skill: '前端'
+    },
+    {
+      get_exp_datetime: '2023-02-12',
+      exp: 1,
+      skill: '后端'
+    },
+    {
+      get_exp_datetime: '2023-02-12',
+      exp: 2,
+      skill: '后端'
+    },
+    {
+      get_exp_datetime: '2023-02-13',
+      exp: 1,
+      skill: '前端'
+    },
+    {
+      get_exp_datetime: '2023-02-13',
+      exp: 2,
+      skill: '后端'
+    },
+    {
+      get_exp_datetime: '2023-02-13',
+      exp: 1,
+      skill: '后端'
+    },
+    {
+      get_exp_datetime: '2023-02-14',
+      exp: 1,
+      skill: '前端'
+    }
+  ];
+
+  // for (var i = 0; i < 7; i++) {
+  //   console.log(
+  //     dayjs()
+  //       .startOf('week')
+  //       .add(i + 1, 'day')
+  //       .format('YYYY-MM-DD')
+  //   );
+  // }
+
+  // console.log(`parseSkillExpTrendData`, parseSkillExpTrendData(mockData));
+
+  if (sqlResult) {
+    const finalResult = parseSkillExpTrendData2(sqlResult);
+    res.send(new SuccessModel({ data: finalResult }));
+  } else {
+    res.send(new ErrorModel({ msg: '获取技能学习趋势失败' }));
   }
 });
 
