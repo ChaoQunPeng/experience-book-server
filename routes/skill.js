@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-15 18:51:55
+ * @LastEditTime: 2024-02-16 21:02:30
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -127,6 +127,7 @@ router.get('/list', async (req, res, next) => {
     newData.currentLevelExp = parseData.currentExp;
     newData.color = parseData.color;
     newData.range = parseData.range;
+    newData.levelExpCap = parseData.levelExpCap;
 
     return newData;
   });

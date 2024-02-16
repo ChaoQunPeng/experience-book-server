@@ -2,10 +2,14 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-01 16:40:17
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-14 09:43:46
+ * @LastEditTime: 2024-02-16 20:47:35
  * @FilePath: /experience-book-server/utils/exp-helper.js
  * @Description:
  */
+const LEVEL_ENUMS = {
+  
+};
+
 function getPhaseInfo(totalExp) {
   if (totalExp >= 0 && totalExp < 1000) {
     const expRange = [
@@ -44,7 +48,9 @@ function getPhaseInfo(totalExp) {
     ];
     return getLevelInfo(totalExp, expRange, '精通者', 799);
   } else if (totalExp > 10000) {
-    return { name: '专家', level: '' };
+    const expRange = [[10000, 99999]];
+
+    return getLevelInfo(totalExp, expRange, '专家', 99999);
   }
 }
 
@@ -60,16 +66,17 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
   const data = {
     name: levelName,
     level: 0, // 当前阶段的等级
-    romanNum: 0,
-    levelBaseExp: levelExp,
-    currentExp: 0, // 当前等级的经验。 例如：总经验200，当前等级经验就是新手2星 1exp/199exp
+    // 当前等级的经验。 例如：总经验200，当前等级经验就是200-199=1
+    currentExp: 0,
+    // 当前经验范围
     range: [],
-    width: {} // 赋值给:style
+    // 当前等级经验上限
+    levelExpCap: 0
   };
 
   const colorMaps = {
-    新手: 'black-85',
-    熟练者: 'blue',
+    新手: 'blue',
+    熟练者: 'green',
     胜任者: 'red',
     精通者: 'purple',
     专家: 'black'
@@ -77,25 +84,9 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
 
   for (let i = 0; i < expRange.length; i++) {
     if (totalExp >= expRange[i][0] && totalExp <= expRange[i][1]) {
-      switch (i) {
-        case 0:
-          data.romanNum = 'I';
-          break;
-        case 1:
-          data.romanNum = 'II';
-          break;
-        case 2:
-          data.romanNum = 'III';
-          break;
-        case 3:
-          data.romanNum = 'IV';
-          break;
-        case 4:
-          data.romanNum = 'V';
-          break;
-      }
-
-      data.level = i + 1;
+      data.level = i;
+      data.range = expRange[i];
+      data.color = colorMaps[levelName];
 
       if (i == 0) {
         data.currentExp = totalExp - expRange[i][0];
@@ -103,8 +94,11 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
         data.currentExp = totalExp - (expRange[i][0] - 1);
       }
 
-      data.range = expRange[i];
-      data.color = colorMaps[levelName];
+      if (levelName == '专家') {
+        data.levelExpCap = 99999;
+      } else {
+        data.levelExpCap = data.range[1] - data.range[0];
+      }
     }
   }
 
