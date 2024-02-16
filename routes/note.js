@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-16 10:21:34
+ * @LastEditTime: 2024-02-16 23:00:09
  * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
@@ -60,7 +60,13 @@ router.put('/:id', async (req, res, next) => {
   const getExpDatetime = exp == 0 ? 'NULL' : dayjs().format('YYYY-MM-DD HH:mm:ss');
 
   const updateInfoSql = `title='${title}', content='${content}', remark='${remark}', skill_id=${skillId}`;
-  const updateExpSql = `exp=${exp} , get_exp_datetime = '${getExpDatetime}'`;
+  let updateExpSql = '';
+
+  if (exp == 0) {
+    updateExpSql = `exp=${exp} , get_exp_datetime = NULL`;
+  } else {
+    updateExpSql = `exp=${exp} , get_exp_datetime = '${getExpDatetime}'`;
+  }
 
   const sqlResult = await sqlExec(
     `UPDATE experience_book.note
