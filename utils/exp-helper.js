@@ -2,13 +2,11 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-01 16:40:17
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-16 20:47:35
+ * @LastEditTime: 2024-02-16 23:06:45
  * @FilePath: /experience-book-server/utils/exp-helper.js
  * @Description:
  */
-const LEVEL_ENUMS = {
-  
-};
+const LEVEL_ENUMS = {};
 
 function getPhaseInfo(totalExp) {
   if (totalExp >= 0 && totalExp < 1000) {
@@ -84,7 +82,7 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
 
   for (let i = 0; i < expRange.length; i++) {
     if (totalExp >= expRange[i][0] && totalExp <= expRange[i][1]) {
-      data.level = i;
+      data.level = i + 1;
       data.range = expRange[i];
       data.color = colorMaps[levelName];
 
