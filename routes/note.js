@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-16 23:00:09
+ * @LastEditTime: 2024-02-20 11:17:39
  * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
@@ -39,7 +39,7 @@ router.post('/', async (req, res, next) => {
  */
 router.delete('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `DELETE FROM experience_book.note WHERE id=${req.params.id}`
+    `UPDATE experience_book.note SET status=0 WHERE id=${req.params.id}`
   ).catch(err => {
     console.log(err);
   });
