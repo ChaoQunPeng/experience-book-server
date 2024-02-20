@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-16 21:02:30
+ * @LastEditTime: 2024-02-20 14:08:49
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -87,8 +87,8 @@ router.get('/list', async (req, res, next) => {
     `
     SELECT 
     s.id,s.name as skill_name ,SUM(n.exp) as exp_total,
-    (SELECT COUNT(*) FROM note n2 WHERE skill_id=s.id) as note_total,
-    (SELECT COUNT(*) FROM note n3 WHERE skill_id=s.id AND n3.exp=0) as todo_note_total
+    (SELECT COUNT(*) FROM note n2 WHERE skill_id=s.id AND n2.status=1) as note_total,
+    (SELECT COUNT(*) FROM note n3 WHERE skill_id=s.id AND n3.exp=0 AND n3.status=1) as todo_note_total
   FROM 
     skill s 
   left join 
@@ -162,7 +162,7 @@ router.get('/note-list/:id', async (req, res, next) => {
   SELECT s.id,s.name,n.id as note_id, n.title , n.content ,n.exp  ,n.create_time as note_create_time
   FROM skill s left join note n 
   on s.id = n.skill_id 
-  WHERE n.skill_id =${req.params.id}
+  WHERE n.skill_id =${req.params.id} AND n.status=1
   ORDER BY n.create_time DESC
   `).catch(err => {
     console.log(err);
@@ -230,7 +230,7 @@ router.get('/:id', async (req, res, next) => {
  */
 router.get('/exp/statistics', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `SELECT s.name ,  SUM(n.exp) as total_exp  FROM skill s  left join note n on s.id = n.skill_id  GROUP BY s.id`
+    `SELECT s.name ,  SUM(n.exp) as total_exp  FROM skill s  left join note n on s.id = n.skill_id WHERE n.status = 1 GROUP BY s.id`
   ).catch(err => {
     console.log(err);
   });
@@ -250,11 +250,267 @@ router.get('/exp/statistics', async (req, res, next) => {
 });
 
 /**
+ * 获取技能笔记数量统计
+ */
+router.get('/note/statistics', async (req, res, next) => {
+  // const data = [
+  //   {
+  //     name: '前端',
+  //     total: 1,
+  //     hasExp: 1
+  //   },
+  //   {
+  //     name: '后端',
+  //     total: 1,
+  //     hasExp: 1
+  //   },
+  //   {
+  //     name: 'AE',
+  //     total: 1,
+  //     hasExp: 1
+  //   },
+  //   {
+  //     name: '平面设计',
+  //     total: 1,
+  //     hasExp: 1
+  //   },
+  //   {
+  //     name: 'PR剪辑',
+  //     total: 1,
+  //     hasExp: 1
+  //   },
+  //   {
+  //     name: '测试',
+  //     total: 1,
+  //     hasExp: 1
+  //   },
+  //   {
+  //     name: '测试',
+  //     total: 5,
+  //     hasExp: 0
+  //   }
+  // ];
+
+  // let b = [
+  //   {
+  //     id: 29,
+  //     title: '点击卡萨丁啊加快速度',
+  //     create_time: '2024-02-08T10:31:38.000Z',
+  //     content:
+  //       '首先安装\n\n```npm\nnpm i tailwindcss\n```\n\n```html \n<!doctype html> \n<html>\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <link href="./output.css" rel="stylesheet">\n</head>\n<body>\n  <h1 class="text-3xl font-bold underline">\n    Hello world!\n  </h1>\n</body>\n</html\n\n',
+  //     exp: 12000,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 29,
+  //     type: 1,
+  //     get_exp_datetime: '2024-02-16T02:21:38.000Z',
+  //     status: 1,
+  //     name: '前端',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 38,
+  //     title: '无标题',
+  //     create_time: '2024-02-16T12:09:52.000Z',
+  //     content: '',
+  //     exp: 4288,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 38,
+  //     type: 1,
+  //     get_exp_datetime: '2024-02-15T02:21:38.000Z',
+  //     status: 1,
+  //     name: 'AE',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 37,
+  //     title: '无标题',
+  //     create_time: '2024-02-16T12:09:48.000Z',
+  //     content: '',
+  //     exp: 9244,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 37,
+  //     type: 1,
+  //     get_exp_datetime: '2024-02-13T02:21:38.000Z',
+  //     status: 1,
+  //     name: '平面设计',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 36,
+  //     title: '无标题',
+  //     create_time: '2024-02-16T12:09:26.000Z',
+  //     content: '',
+  //     exp: 2483,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 36,
+  //     type: 1,
+  //     get_exp_datetime: '2024-02-12T02:21:38.000Z',
+  //     status: 1,
+  //     name: '后端',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 39,
+  //     title: '无标题',
+  //     create_time: '2024-02-16T12:19:28.000Z',
+  //     content: '',
+  //     exp: 876,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 39,
+  //     type: 1,
+  //     get_exp_datetime: '2024-02-18T02:21:38.000Z',
+  //     status: 1,
+  //     name: 'PR剪辑',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 40,
+  //     title: '无标题456',
+  //     create_time: '2024-02-19T07:25:57.000Z',
+  //     content: '',
+  //     exp: 0,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 40,
+  //     type: 1,
+  //     get_exp_datetime: null,
+  //     status: 0,
+  //     name: '测试',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 40,
+  //     title: '无标题',
+  //     create_time: '2024-02-19T07:25:57.000Z',
+  //     content: '',
+  //     exp: 0,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 40,
+  //     type: 1,
+  //     get_exp_datetime: null,
+  //     status: 0,
+  //     name: '测试',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 40,
+  //     title: '无标题',
+  //     create_time: '2024-02-19T07:25:57.000Z',
+  //     content: '',
+  //     exp: 0,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 40,
+  //     type: 1,
+  //     get_exp_datetime: null,
+  //     status: 1,
+  //     name: '测试',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 40,
+  //     title: '无标题',
+  //     create_time: '2024-02-19T07:25:57.000Z',
+  //     content: '',
+  //     exp: 0,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 40,
+  //     type: 1,
+  //     get_exp_datetime: null,
+  //     status: 1,
+  //     name: '测试',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 40,
+  //     title: '无标题',
+  //     create_time: '2024-02-19T07:25:57.000Z',
+  //     content: '',
+  //     exp: 0,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 40,
+  //     type: 1,
+  //     get_exp_datetime: null,
+  //     status: 1,
+  //     name: '测试',
+  //     description: ''
+  //   },
+  //   {
+  //     id: 40,
+  //     title: '无标题123',
+  //     create_time: '2024-02-19T07:25:57.000Z',
+  //     content: '',
+  //     exp: 10,
+  //     remark: '',
+  //     end_time: null,
+  //     skill_id: 40,
+  //     type: 1,
+  //     get_exp_datetime: '2024-02-20T03:24:09.000Z',
+  //     status: 1,
+  //     name: '测试',
+  //     description: ''
+  //   }
+  // ];
+
+  // const sqlResult = await sqlExec(
+  //   `SELECT s.name , count(*) as total  FROM skill s  left join note n on s.id = n.skill_id WHERE n.status = 1 GROUP BY s.id`
+  // ).catch(err => {
+  //   console.log(err);
+  // });
+
+  const sqlResult = await sqlExec(
+    `SELECT * FROM note n left join skill s on n.skill_id = s.id WHERE n.status=1`
+  ).catch(err => {
+    console.log(err);
+  });
+
+  const getResult = (data, equalTo0) => {
+    const resultMap = {};
+
+    const filterData = equalTo0 ? data.filter(e => e.exp == 0) : data.filter(e => e.exp > 0);
+
+    filterData.forEach(item => {
+      const { name, exp } = item;
+
+      if (resultMap[name]) {
+        resultMap[name].total++;
+        if (exp > 0) {
+          resultMap[name].hasExp = 'exp>0的笔记数';
+        }
+      } else {
+        resultMap[name] = {
+          name,
+          total: 1,
+          hasExp: exp > 0 ? 'exp>0的笔记数' : 'exp=0的笔记数'
+        };
+      }
+    });
+
+    return Object.values(resultMap);
+  };
+
+  if (sqlResult) {
+    const result = [...getResult(sqlResult, true), ...getResult(sqlResult, false)];
+    res.send(new SuccessModel({ data: result }));
+  } else {
+    res.send(new ErrorModel({ msg: '获取技能笔记数统计失败' }));
+  }
+});
+
+/**
  * 获取技能学习趋势
  */
 router.get('/exp/trend', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `SELECT s.name as skill ,n.get_exp_datetime, n.exp  FROM skill s LEFT JOIN note n on s.id = n.skill_id`
+    `SELECT s.name as skill ,n.get_exp_datetime, n.exp  FROM skill s LEFT JOIN note n on s.id = n.skill_id WHERE n.status =1`
   ).catch(err => {
     console.log(err);
   });
@@ -267,45 +523,6 @@ router.get('/exp/trend', async (req, res, next) => {
   sqlResult.forEach(e => {
     e.get_exp_datetime = dayjs(e.get_exp_datetime).format('YYYY-MM-DD');
   });
-
-  /**
-   * @description: 处理技能经验趋势的数据
-   * @param {*} data
-   * @return {*}
-   */
-  const parseSkillExpTrendData = data => {
-    // 使用 reduce() 方法处理数据
-    const result = data.reduce((accumulator, current) => {
-      const key = `${current.get_exp_datetime}-${current.skill}`;
-
-      if (accumulator[key]) {
-        accumulator[key].exp += current.exp;
-      } else {
-        accumulator[key] = { ...current };
-      }
-
-      return accumulator;
-    }, {});
-
-    // 补充缺失的日期和技能组合
-    const allDates = [...new Set(data.map(item => item.get_exp_datetime))];
-    const allSkills = [...new Set(data.map(item => item.skill))];
-
-    allDates.forEach(date => {
-      allSkills.forEach(skill => {
-        const key = `${date}-${skill}`;
-        if (!result[key]) {
-          result[key] = {
-            get_exp_datetime: date,
-            exp: 0,
-            skill: skill
-          };
-        }
-      });
-    });
-
-    return Object.values(result);
-  };
 
   const parseSkillExpTrendData2 = data => {
     // 构建日期范围
@@ -342,65 +559,6 @@ router.get('/exp/trend', async (req, res, next) => {
 
     return result;
   };
-
-  const mockData = [
-    {
-      get_exp_datetime: '2023-02-12',
-      exp: 1,
-      skill: '前端'
-    },
-    {
-      get_exp_datetime: '2023-02-12',
-      exp: 2,
-      skill: '前端'
-    },
-    {
-      get_exp_datetime: '2023-02-12',
-      exp: 3,
-      skill: '前端'
-    },
-    {
-      get_exp_datetime: '2023-02-12',
-      exp: 1,
-      skill: '后端'
-    },
-    {
-      get_exp_datetime: '2023-02-12',
-      exp: 2,
-      skill: '后端'
-    },
-    {
-      get_exp_datetime: '2023-02-13',
-      exp: 1,
-      skill: '前端'
-    },
-    {
-      get_exp_datetime: '2023-02-13',
-      exp: 2,
-      skill: '后端'
-    },
-    {
-      get_exp_datetime: '2023-02-13',
-      exp: 1,
-      skill: '后端'
-    },
-    {
-      get_exp_datetime: '2023-02-14',
-      exp: 1,
-      skill: '前端'
-    }
-  ];
-
-  // for (var i = 0; i < 7; i++) {
-  //   console.log(
-  //     dayjs()
-  //       .startOf('week')
-  //       .add(i + 1, 'day')
-  //       .format('YYYY-MM-DD')
-  //   );
-  // }
-
-  // console.log(`parseSkillExpTrendData`, parseSkillExpTrendData(mockData));
 
   if (sqlResult) {
     const finalResult = parseSkillExpTrendData2(sqlResult);
