@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:15:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-08 12:00:35
+ * @LastEditTime: 2024-02-21 20:20:42
  * @FilePath: /experience-book-server/app.js
  * @Description:
  */
@@ -20,6 +20,7 @@ var indexRouter = require('./routes/index');
 var skillRouter = require('./routes/skill');
 var noteRouter = require('./routes/note');
 var dailyCompleteRouter = require('./routes/daily-complete');
+var commonRouter = require('./routes/common');
 
 var app = express();
 
@@ -35,7 +36,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
+// 配置静态资源访问图片等。要访问的话localhost:3000/image.png 这样就行嘞
+
+app.use(express.static(path.join(__dirname, 'uploads/content')));
 
 app.use(function (req, res, next) {
   console.log(1);
@@ -62,6 +67,7 @@ app.use('/', indexRouter);
 app.use('/skill', skillRouter);
 app.use('/note', noteRouter);
 app.use('/daily-complete', dailyCompleteRouter);
+app.use('/common', commonRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -72,7 +78,7 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
   // console.log(JSON.stringify(err), JSON.stringify(req), JSON.stringify(res));
-  console.log(`错误：`,JSON.stringify(err));
+  console.log(`错误：`, JSON.stringify(err));
 
   // set locals, only providing error in development
   res.locals.message = err.message;
