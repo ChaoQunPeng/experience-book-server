@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-21 15:31:35
+ * @LastEditTime: 2024-02-22 13:25:41
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -12,7 +12,7 @@ var router = express.Router();
 const { sqlExec } = require('../mysql/exec');
 const { SuccessModel, ErrorModel } = require('../http/response-model');
 const dayjs = require('dayjs');
-const { getPhaseInfo } = require('../utils/exp-helper');
+const { getExpPhaseInfo } = require('../utils/exp-helper');
 
 /**
  * 新增技能
@@ -110,7 +110,7 @@ router.get('/list', async (req, res, next) => {
   result = sqlResult.map(e => {
     const newData = {};
 
-    const parseData = getPhaseInfo(parseInt(e.exp_total ?? 0));
+    const parseData = getExpPhaseInfo(parseInt(e.exp_total ?? 0));
 
     if (!parseData) {
       return;
@@ -119,7 +119,7 @@ router.get('/list', async (req, res, next) => {
     newData.id = e.id;
     newData.name = e.skill_name;
     newData.noteTotal = e.note_total;
-    newData.expTotal = e.exp_total;
+    newData.expTotal = Number(e.exp_total);
     newData.todoNoteTotal = e.todo_note_total;
 
     newData.level = parseData.level;

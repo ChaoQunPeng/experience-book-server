@@ -8,7 +8,7 @@
  */
 const LEVEL_ENUMS = {};
 
-function getPhaseInfo(totalExp) {
+function getExpPhaseInfo(totalExp) {
   if (totalExp >= 0 && totalExp < 1000) {
     const expRange = [
       [0, 199],
@@ -104,5 +104,5 @@ function getLevelInfo(totalExp, expRange, levelName, levelExp) {
 }
 
 module.exports = {
-  getPhaseInfo
+  getExpPhaseInfo
 };
