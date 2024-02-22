@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:15:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-21 23:53:52
+ * @LastEditTime: 2024-02-22 11:46:10
  * @FilePath: /experience-book-server/app.js
  * @Description:
  */
@@ -39,11 +39,7 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 // 配置静态资源访问图片等。要访问的话localhost:3000/image.png 这样就行嘞
-if (process.env.ENV == 'develop') {
-  app.use(express.static(path.join(__dirname, 'uploads-test/content')));
-} else {
-  app.use(express.static(path.join(__dirname, 'uploads-prod/content')));
-}
+app.use(express.static(path.join(__dirname, 'uploads/content')));
 
 
 app.use(function (req, res, next) {
