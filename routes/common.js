@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-21 16:43:36
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-21 20:14:41
+ * @LastEditTime: 2024-02-22 11:15:02
  * @FilePath: /experience-book-server/routes/common.js
  * @Description:
  */
@@ -18,7 +18,11 @@ const { sqlExec } = require('../mysql/exec');
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, `uploads/content/`); // 上传文件保存的目录
+      if (process.env.ENV == 'develop') {
+        cb(null, `uploads/content/`); // 上传文件保存的目录
+      } else {
+        cb(null, `uploads/content/`); // 上传文件保存的目录
+      }
     },
     filename: (req, file, cb) => {
       const ext = path.extname(file.originalname);
@@ -32,6 +36,11 @@ router.post('/upload', async (req, res, next) => {
   try {
     upload(req, res, async function (err) {
       console.log(`req.file`, req.file);
+
+      if(!req.file) {
+        res.send(new ErrorModel({ msg: `文件不存在，请选择一个文件！` }));
+        return;
+      }
 
       const sqlResult = await sqlExec(`
       INSERT INTO experience_book.file
@@ -51,7 +60,7 @@ router.post('/upload', async (req, res, next) => {
         res.send(new ErrorModel({ msg: err }));
       } else {
         const data = {
-          id: 1,
+          id: sqlResult.insertId,
           url: req.file.path,
           name: req.file.filename
         };
