@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-21 16:43:36
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-22 11:15:02
+ * @LastEditTime: 2024-02-23 13:24:57
  * @FilePath: /experience-book-server/routes/common.js
  * @Description:
  */
@@ -32,12 +32,11 @@ const upload = multer({
 }).single('file');
 
 router.post('/upload', async (req, res, next) => {
-  console.log(`5`, req.file);
   try {
     upload(req, res, async function (err) {
       console.log(`req.file`, req.file);
 
-      if(!req.file) {
+      if (!req.file) {
         res.send(new ErrorModel({ msg: `文件不存在，请选择一个文件！` }));
         return;
       }
@@ -71,13 +70,24 @@ router.post('/upload', async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
+});
 
-  // console.log(req.file);
-  // if (!req.file) {
-  //   res.send(new ErrorModel({ msg: '请上传文件' }));
-  // } else {
-  //   res.send(new SuccessModel({ msg: '上传成功' }));
-  // }
+router.get('/export-data', async (req, res, next) => {
+  const tableList = await sqlExec(`SHOW TABLES;`);
+
+  const dataMaps = {};
+
+  for (let i = 0; i < tableList.length; i++) {
+    const table = tableList[i];
+
+    dataMaps[table.Tables_in_experience_book] = [];
+
+    const rows = await sqlExec(`SELECT * FROM ${table.Tables_in_experience_book};`);
+
+    dataMaps[table.Tables_in_experience_book] = rows;
+  }
+
+  res.send(new SuccessModel({ msg: '查询成功', data: dataMaps }));
 });
 
 module.exports = router;
