@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-20 11:17:39
+ * @LastEditTime: 2024-02-23 12:23:24
  * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
@@ -57,20 +57,11 @@ router.delete('/:id', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   const { title, content, exp, remark, skillId } = req.body;
 
-  const getExpDatetime = exp == 0 ? 'NULL' : dayjs().format('YYYY-MM-DD HH:mm:ss');
-
   const updateInfoSql = `title='${title}', content='${content}', remark='${remark}', skill_id=${skillId}`;
-  let updateExpSql = '';
-
-  if (exp == 0) {
-    updateExpSql = `exp=${exp} , get_exp_datetime = NULL`;
-  } else {
-    updateExpSql = `exp=${exp} , get_exp_datetime = '${getExpDatetime}'`;
-  }
 
   const sqlResult = await sqlExec(
     `UPDATE experience_book.note
-  SET ${Object.keys(req.body).findIndex(e => e == 'exp') > -1 ? updateExpSql : updateInfoSql}
+  SET ${updateInfoSql}
   WHERE id=${req.params.id};`
   ).catch(err => {
     console.log(err);
@@ -80,6 +71,53 @@ router.put('/:id', async (req, res, next) => {
     res.send(new SuccessModel());
   } else {
     res.send(new ErrorModel({ msg: '修改笔记失败' }));
+  }
+});
+
+/**
+ * 更新经验
+ */
+router.put('/exp/update/:id', async (req, res, next) => {
+  const noteList = await sqlExec(
+    `
+    SELECT * FROM experience_book.note WHERE id = '${req.params.id}'
+    `
+  ).catch(err => {
+    console.log(`err`, err);
+  });
+
+  let sql = '';
+
+  // 获得经验日期不存在，经验大于0则更新时间和经验字段
+  if (noteList[0].get_exp_datetime) {
+    sql = `
+       UPDATE 
+         experience_book.note 
+       SET 
+           exp = '${req.body.exp}' 
+       WHERE id=${req.params.id};
+       `;
+  } else if (!noteList[0].get_exp_datetime && req.body.exp > 0) {
+    sql = `
+        UPDATE 
+          experience_book.note 
+        SET 
+            exp = '${req.body.exp}' ,
+            get_exp_datetime = '${dayjs().format('YYYY-MM-DD HH:mm:ss')}' 
+        WHERE id=${req.params.id};
+      `;
+  } else {
+    res.send(new SuccessModel());
+  }
+
+  const sqlResult = await sqlExec(sql).catch(err => {
+    console.log(err);
+  });
+
+  if (sqlResult && sqlResult.affectedRows > 0) {
+    res.send(new SuccessModel({ msg: '新增经验值成功' }));
+  } else {
+    res.send(new ErrorModel({ msg: '更新经验失败' }));
   }
 });
 
