@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-21 16:43:36
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-23 13:24:57
+ * @LastEditTime: 2024-02-24 15:37:43
  * @FilePath: /experience-book-server/routes/common.js
  * @Description:
  */
@@ -72,6 +72,9 @@ router.post('/upload', async (req, res, next) => {
   }
 });
 
+/**
+ *  导出数据
+ */
 router.get('/export-data', async (req, res, next) => {
   const tableList = await sqlExec(`SHOW TABLES;`);
 
@@ -88,6 +91,13 @@ router.get('/export-data', async (req, res, next) => {
   }
 
   res.send(new SuccessModel({ msg: '查询成功', data: dataMaps }));
+});
+
+/**
+ *  容器启动健康健康
+ */
+router.get('/healthcheck', async (req, res, next) => {
+  res.send(new SuccessModel());
 });
 
 module.exports = router;
