@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-23 12:23:24
+ * @LastEditTime: 2024-02-25 14:57:41
  * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
@@ -18,7 +18,7 @@ const dayjs = require('dayjs');
  */
 router.post('/', async (req, res, next) => {
   const sqlResult = await sqlExec(`
-  INSERT INTO experience_book.note
+  INSERT INTO note
   (title, create_time, content, exp, remark, end_time, skill_id , type)
   VALUES('无标题', '${dayjs().format('YYYY-MM-DD HH:mm:ss')}', '', 0, '', NULL, ${
     req.body.skillId
@@ -39,7 +39,7 @@ router.post('/', async (req, res, next) => {
  */
 router.delete('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `UPDATE experience_book.note SET status=0 WHERE id=${req.params.id}`
+    `UPDATE note SET status=0 WHERE id=${req.params.id}`
   ).catch(err => {
     console.log(err);
   });
@@ -60,7 +60,7 @@ router.put('/:id', async (req, res, next) => {
   const updateInfoSql = `title='${title}', content='${content}', remark='${remark}', skill_id=${skillId}`;
 
   const sqlResult = await sqlExec(
-    `UPDATE experience_book.note
+    `UPDATE note
   SET ${updateInfoSql}
   WHERE id=${req.params.id};`
   ).catch(err => {
@@ -80,7 +80,7 @@ router.put('/:id', async (req, res, next) => {
 router.put('/exp/update/:id', async (req, res, next) => {
   const noteList = await sqlExec(
     `
-    SELECT * FROM experience_book.note WHERE id = '${req.params.id}'
+    SELECT * FROM note WHERE id = '${req.params.id}'
     `
   ).catch(err => {
     console.log(`err`, err);
@@ -92,7 +92,7 @@ router.put('/exp/update/:id', async (req, res, next) => {
   if (noteList[0].get_exp_datetime) {
     sql = `
        UPDATE 
-         experience_book.note 
+         note 
        SET 
            exp = '${req.body.exp}' 
        WHERE id=${req.params.id};
@@ -100,7 +100,7 @@ router.put('/exp/update/:id', async (req, res, next) => {
   } else if (!noteList[0].get_exp_datetime && req.body.exp > 0) {
     sql = `
         UPDATE 
-          experience_book.note 
+          note 
         SET 
             exp = '${req.body.exp}' ,
             get_exp_datetime = '${dayjs().format('YYYY-MM-DD HH:mm:ss')}' 
@@ -126,7 +126,7 @@ router.put('/exp/update/:id', async (req, res, next) => {
  */
 router.get('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `SELECT *,skill_id as skillId FROM experience_book.note WHERE id = ${req.params.id}`
+    `SELECT *,skill_id as skillId FROM note WHERE id = ${req.params.id}`
   ).catch(err => {
     console.log(err);
   });

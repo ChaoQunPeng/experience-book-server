@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-25 14:17:51
+ * @LastEditTime: 2024-02-25 14:41:15
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -21,14 +21,14 @@ const mysql = require('mysql2/promise');
  */
 router.post('/', async (req, res, next) => {
   const sqlResult = await sqlExec(`
-    INSERT INTO experience_book.skill
-    (name, description, create_time)
-    VALUES('${req.body.name}', '${req.body.description}', '${dayjs().format()}');
+    INSERT INTO skill
+    (name, description, create_time,sort)
+    VALUES('${req.body.name}', '${req.body.description}', '${dayjs().format()}',999999);
   `).catch(err => {
     console.log(err);
   });
 
-  if (sqlResult.affectedRows) {
+  if (sqlResult && sqlResult.affectedRows) {
     res.send(new SuccessModel({ data: sqlResult }));
   } else {
     res.send(new ErrorModel({ msg: '新增技能失败' }));
@@ -40,7 +40,7 @@ router.post('/', async (req, res, next) => {
  */
 router.delete('/:id', async (req, res, next) => {
   const hasNote = await sqlExec(`
-    SELECT * FROM experience_book.note WHERE skill_id=${req.params.id}
+    SELECT * FROM note WHERE skill_id=${req.params.id}
     `).catch(err => {
     console.log(err);
   });
@@ -49,7 +49,7 @@ router.delete('/:id', async (req, res, next) => {
     res.send(new ErrorModel({ msg: `技能下面有笔记，不能删除哦！` }));
   } else {
     const sqlResult = await sqlExec(
-      `DELETE FROM experience_book.skill WHERE id=${req.params.id}`
+      `DELETE FROM skill WHERE id=${req.params.id}`
     ).catch(err => {
       console.log(err);
     });
@@ -67,7 +67,7 @@ router.delete('/:id', async (req, res, next) => {
  */
 router.put('/:id', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `UPDATE experience_book.skill
+    `UPDATE skill
     SET name='${req.body.name}', description='${req.body.description}'
     WHERE id=${req.params.id};`
   ).catch(err => {
@@ -148,7 +148,7 @@ router.get('/list', async (req, res, next) => {
  */
 router.get('/options', async (req, res, next) => {
   const sqlResult = await sqlExec(
-    `SELECT id, name FROM experience_book.skill ORDER BY sort ASC`
+    `SELECT id, name FROM skill ORDER BY sort ASC`
   ).catch(err => {
     console.log(err);
   });
@@ -375,7 +375,7 @@ router.put('/list/sort', async (req, res, next) => {
 
     // 更新每条数据的排序字段
     for (let i = 0; i < newSortIds.length; i++) {
-      await connection.query('UPDATE experience_book.skill SET sort = ? WHERE id = ?', [
+      await connection.query('UPDATE skill SET sort = ? WHERE id = ?', [
         i + 1,
         newSortIds[i]
       ]);
@@ -387,7 +387,7 @@ router.put('/list/sort', async (req, res, next) => {
     res.send(new SuccessModel());
 
     // 排序数据库中数据
-    // const [rows] = await connection.query('SELECT * FROM experience_book.skill ORDER BY sort ASC');
+    // const [rows] = await connection.query('SELECT * FROM skill ORDER BY sort ASC');
 
     // if (rows) {
     //   res.send(new SuccessModel());

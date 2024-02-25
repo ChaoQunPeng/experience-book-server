@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-21 16:43:36
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-24 15:37:43
+ * @LastEditTime: 2024-02-25 15:07:38
  * @FilePath: /experience-book-server/routes/common.js
  * @Description:
  */
@@ -42,7 +42,7 @@ router.post('/upload', async (req, res, next) => {
       }
 
       const sqlResult = await sqlExec(`
-      INSERT INTO experience_book.file
+      INSERT INTO file
       (upload_datetime, url, name, size, ext)
       VALUES( '${dayjs().format()}', '${req.file.path}', '${req.file.filename}', '${
         req.file.size
