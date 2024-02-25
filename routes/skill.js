@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-25 14:41:15
+ * @LastEditTime: 2024-02-25 19:04:39
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -48,9 +48,7 @@ router.delete('/:id', async (req, res, next) => {
   if (hasNote && hasNote.length > 0) {
     res.send(new ErrorModel({ msg: `技能下面有笔记，不能删除哦！` }));
   } else {
-    const sqlResult = await sqlExec(
-      `DELETE FROM skill WHERE id=${req.params.id}`
-    ).catch(err => {
+    const sqlResult = await sqlExec(`DELETE FROM skill WHERE id=${req.params.id}`).catch(err => {
       console.log(err);
     });
 
@@ -147,9 +145,7 @@ router.get('/list', async (req, res, next) => {
  * 获取技能下拉选项
  */
 router.get('/options', async (req, res, next) => {
-  const sqlResult = await sqlExec(
-    `SELECT id, name FROM skill ORDER BY sort ASC`
-  ).catch(err => {
+  const sqlResult = await sqlExec(`SELECT id, name FROM skill ORDER BY sort ASC`).catch(err => {
     console.log(err);
   });
 
@@ -318,9 +314,14 @@ router.get('/exp/trend', async (req, res, next) => {
   });
 
   const parseSkillExpTrendData2 = data => {
+    const today = new Date();
+
     // 构建日期范围
-    const sdate = dayjs().startOf('week').add(1, 'day').format('YYYY-MM-DD');
-    const edate = dayjs().startOf('week').add(7, 'day').format('YYYY-MM-DD');
+    const sdate = new Date(
+      today.setDate(today.getDate() - today.getDay() + (today.getDay() == 0 ? -6 : 1))
+    );
+    
+    const edate = new Date(today.setDate(sdate.getDate() + 6));
 
     const startDate = new Date(sdate); // 开始日期
     const endDate = new Date(edate); // 结束日期
@@ -375,10 +376,7 @@ router.put('/list/sort', async (req, res, next) => {
 
     // 更新每条数据的排序字段
     for (let i = 0; i < newSortIds.length; i++) {
-      await connection.query('UPDATE skill SET sort = ? WHERE id = ?', [
-        i + 1,
-        newSortIds[i]
-      ]);
+      await connection.query('UPDATE skill SET sort = ? WHERE id = ?', [i + 1, newSortIds[i]]);
     }
 
     // 提交事务
