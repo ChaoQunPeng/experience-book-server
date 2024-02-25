@@ -6,7 +6,7 @@
     "start": "cross-env ENV=develop nodemon ./bin/www",
     "prod": "cross-env ENV=production nodemon ./bin/www",
     "build-image": "docker build -t exp-book-server .",
-    "publish": "cp -R * /Users/pengchaoqun/code/experience-book/prod-apps/server/"
+    "publish": "cp -R * /Users/pengchaoqun/code/experience-book/experience-book-host/server/"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
