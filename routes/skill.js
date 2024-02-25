@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-22 13:25:41
+ * @LastEditTime: 2024-02-25 14:17:51
  * @FilePath: /experience-book-server/routes/skill.js
  * @Description:
  */
@@ -13,6 +13,8 @@ const { sqlExec } = require('../mysql/exec');
 const { SuccessModel, ErrorModel } = require('../http/response-model');
 const dayjs = require('dayjs');
 const { getExpPhaseInfo } = require('../utils/exp-helper');
+const { db, config } = require('../mysql/connection');
+const mysql = require('mysql2/promise');
 
 /**
  * 新增技能
@@ -95,6 +97,8 @@ router.get('/list', async (req, res, next) => {
     note n on s.id =n.skill_id 
   GROUP BY 
     s.id
+  ORDER BY 
+    sort ASC
     `
   ).catch(err => {
     console.log(err);
@@ -143,7 +147,9 @@ router.get('/list', async (req, res, next) => {
  * 获取技能下拉选项
  */
 router.get('/options', async (req, res, next) => {
-  const sqlResult = await sqlExec(`SELECT id, name FROM experience_book.skill;`).catch(err => {
+  const sqlResult = await sqlExec(
+    `SELECT id, name FROM experience_book.skill ORDER BY sort ASC`
+  ).catch(err => {
     console.log(err);
   });
 
@@ -352,6 +358,48 @@ router.get('/exp/trend', async (req, res, next) => {
     res.send(new SuccessModel({ data: finalResult }));
   } else {
     res.send(new ErrorModel({ msg: '获取技能学习趋势失败' }));
+  }
+});
+
+router.put('/list/sort', async (req, res, next) => {
+  const pool = mysql.createPool(config);
+
+  const connection = await pool.getConnection();
+
+  try {
+    // 开启事务
+    await connection.beginTransaction();
+
+    // 假设dataList是包含需要更新排序字段的数据集合的数组，sortValues是前端传递的排序值数组
+    const newSortIds = req.body.ids;
+
+    // 更新每条数据的排序字段
+    for (let i = 0; i < newSortIds.length; i++) {
+      await connection.query('UPDATE experience_book.skill SET sort = ? WHERE id = ?', [
+        i + 1,
+        newSortIds[i]
+      ]);
+    }
+
+    // 提交事务
+    await connection.commit();
+
+    res.send(new SuccessModel());
+
+    // 排序数据库中数据
+    // const [rows] = await connection.query('SELECT * FROM experience_book.skill ORDER BY sort ASC');
+
+    // if (rows) {
+    //   res.send(new SuccessModel());
+    // } else {
+    //   res.send(new ErrorModel({ msg: '修改排序失败' }));
+    // }
+  } catch (err) {
+    await connection.rollback();
+    res.send(new ErrorModel({ msg: err }));
+    throw err;
+  } finally {
+    pool.releaseConnection(connection);
   }
 });
 
