@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2023-12-24 22:24:56
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-25 14:57:41
+ * @LastEditTime: 2024-02-26 23:38:43
  * @FilePath: /experience-book-server/routes/note.js
  * @Description:
  */
@@ -20,7 +20,7 @@ router.post('/', async (req, res, next) => {
   const sqlResult = await sqlExec(`
   INSERT INTO note
   (title, create_time, content, exp, remark, end_time, skill_id , type)
-  VALUES('无标题', '${dayjs().format('YYYY-MM-DD HH:mm:ss')}', '', 0, '', NULL, ${
+  VALUES('', '${dayjs().format('YYYY-MM-DD HH:mm:ss')}', '', 0, '', NULL, ${
     req.body.skillId
   },1);
   `).catch(err => {
