@@ -2,7 +2,7 @@
  # @Author: PengChaoQun 1152684231@qq.com
  # @Date: 2024-02-22 09:39:25
  # @LastEditors: PengChaoQun 1152684231@qq.com
- # @LastEditTime: 2024-02-25 16:14:12
+ # @LastEditTime: 2024-02-27 14:31:06
  # @FilePath: /experience-book-server/bin/publish.sh
  # @Description: 
 ### 
@@ -12,7 +12,6 @@ cp -R ./http /Users/pengchaoqun/code/experience-book/experience-book-host/server
 cp -R ./mysql /Users/pengchaoqun/code/experience-book/experience-book-host/server/
 cp -R ./node_modules /Users/pengchaoqun/code/experience-book/experience-book-host/server/
 cp -R ./routes /Users/pengchaoqun/code/experience-book/experience-book-host/server/
-cp -R ./uploads /Users/pengchaoqun/code/experience-book/experience-book-host/server/
 cp -R ./utils /Users/pengchaoqun/code/experience-book/experience-book-host/server/
 cp -R ./views /Users/pengchaoqun/code/experience-book/experience-book-host/server/
 cp -R ./app.js /Users/pengchaoqun/code/experience-book/experience-book-host/server/

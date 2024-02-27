@@ -2,7 +2,7 @@
  * @Author: PengChaoQun 1152684231@qq.com
  * @Date: 2024-02-21 16:43:36
  * @LastEditors: PengChaoQun 1152684231@qq.com
- * @LastEditTime: 2024-02-25 15:07:38
+ * @LastEditTime: 2024-02-27 14:27:30
  * @FilePath: /experience-book-server/routes/common.js
  * @Description:
  */
@@ -18,11 +18,22 @@ const { sqlExec } = require('../mysql/exec');
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      if (process.env.ENV == 'develop') {
-        cb(null, `uploads/content/`); // 上传文件保存的目录
-      } else {
-        cb(null, `uploads/content/`); // 上传文件保存的目录
+      const uploadsPath = path.join(__dirname, '..', 'uploads');
+      const contentPath = path.join(uploadsPath, 'content');
+
+      // 检查 uploads 文件夹是否存在，如果不存在则创建
+      if (!fs.existsSync(uploadsPath)) {
+        fs.mkdirSync(uploadsPath);
+        console.log('创建 uploads 文件夹成功！');
       }
+
+      // 检查 content 文件夹是否存在，如果不存在则创建
+      if (!fs.existsSync(contentPath)) {
+        fs.mkdirSync(contentPath);
+        console.log('在 uploads 文件夹下创建 content 文件夹成功！');
+      }
+
+      cb(null, 'uploads/content/'); // 上传文件保存的目录
     },
     filename: (req, file, cb) => {
       const ext = path.extname(file.originalname);
